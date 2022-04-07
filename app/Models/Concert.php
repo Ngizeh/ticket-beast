@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\NotEnoughTicketsRemainingException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,15 +25,40 @@ class Concert extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
     public function orderTickets($email, $ticketQuantity)
     {
+        $tickets = $this->tickets()->available()->take($ticketQuantity)->get();
+
+        if($ticketQuantity > $tickets->count()){
+            throw new NotEnoughTicketsRemainingException();
+        }
+
         $order = $this->orders()->create(['email' => $email]);
 
-        foreach (range(1, $ticketQuantity) as $i){
-            $order->tickets()->create();
+        foreach ($tickets as $ticket){
+            $order->tickets()->save($ticket);
         }
 
         return $order;
+    }
+
+    public function addTickets($tickets)
+    {
+        foreach (range(1, $tickets) as $i){
+            $this->tickets()->create();
+        }
+
+        return $this;
+    }
+
+    public function ticketsRemaining()
+    {
+        return $this->tickets()->available()->count();
     }
 
     public function getFormattedDateAttribute()

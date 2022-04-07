@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 use App\Models\Concert;
 use App\Billing\PaymentGateway;
@@ -29,18 +30,23 @@ class PurchaseTicketTest extends TestCase
 
     public function postInValidated($data, $valid = null)
     {
-        $response = $this->postJson("/concert/{$this->concert->id}/orders", $this->validateData([$data => $valid]));
+        $response = $this->orderTickets($this->concert, $this->validateData([$data => $valid]));
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrorFor($data);
     }
 
+    public function orderTickets($concert, $data): TestResponse
+    {
+        return $this->postJson("/concert/$concert->id/orders", $data);
+    }
+
     /** @test **/
     public function customer_can_purchase_a_ticket()
     {
-        $concert = Concert::factory()->published()->create(['ticket_price' => 2500]);
+        $concert = Concert::factory()->published()->create(['ticket_price' => 2500])->addTickets(3);
 
-        $this->postJson("/concert/$concert->id/orders", [
+        $this->orderTickets($concert, [
             'email' => 'john@example.com',
             'ticket_quantity' => 3,
             'payment_token' => $this->paymentGateway->getValidToken()
@@ -58,9 +64,9 @@ class PurchaseTicketTest extends TestCase
     /** @test **/
     public function customer_can_not_purchase_a_ticket_that_are_not_published()
     {
-        $concert = Concert::factory()->unpublished()->create(['ticket_price' => 2500]);
+        $concert = Concert::factory()->unpublished()->create(['ticket_price' => 2500])->addTickets(3);
 
-        $this->postJson("/concert/$concert->id/orders", [
+        $this->orderTickets($concert, [
             'email' => 'john@example.com',
             'ticket_quantity' => 3,
             'payment_token' => $this->paymentGateway->getValidToken()
@@ -74,15 +80,40 @@ class PurchaseTicketTest extends TestCase
     }
 
     /** @test **/
+    public function customer_can_not_order_more_tickets_than_remaining()
+    {
+        $concert = Concert::factory()->published()->create(['ticket_price' => 2500])->addTickets(50);
+
+        $response = $this->orderTickets($concert, [
+            'email' => 'john@example.com',
+            'ticket_quantity' => 52,
+            'payment_token' => $this->paymentGateway->getValidToken()
+        ]);
+
+        $response->assertStatus(422);
+        $orders = $concert->tickets()->whereEmail('john@example.com')->first();
+        $this->assertNull($orders);
+        $this->assertEquals(0, $this->paymentGateway->totalCharges());
+        $this->assertEquals(50, $concert->ticketsRemaining());
+
+    }
+
+    /** @test **/
     public function order_is_not_created_if_payment_fails()
     {
+        $concert = Concert::factory()->published()->create()->addTickets(50);
 
-        $this->postJson("/concert/{$this->concert->id}/orders", $this->validateData(['payment_token' => 'invalid-token']))
-            ->assertStatus(422);
+        $response = $this->orderTickets($concert, [
+            'email' => 'john@example.com',
+            'ticket_quantity' => 52,
+            'payment_token' => 'invalid-token'
+        ]);
 
+        $response->assertStatus(422);
         $order = $this->concert->orders()->whereEmail('john@example.com')->first();
-
+        $this->assertEquals(0, $this->paymentGateway->totalCharges());
         $this->assertNull($order);
+        $this->assertEquals(50, $concert->ticketsRemaining());
     }
 
     /** @test **/

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotEnoughTicketsRemainingException;
 use App\Models\Concert;
 use App\Billing\PaymentGateway;
 use Illuminate\Http\JsonResponse;
@@ -27,14 +28,16 @@ class ConcertOrdersController extends Controller
         $concert = Concert::published()->findOrFail($id);
 
         try {
-            $amount = request('ticket_quantity') * $concert->ticket_price;
-            $this->paymentGateway->charge($amount, request('payment_token'));
-            $concert->orderTickets(request('email'), request('ticket_quantity'));
+            $order = $concert->orderTickets(request('email'), request('ticket_quantity'));
+            $this->paymentGateway->charge(request('ticket_quantity') * $concert->ticket_price, request('payment_token'));
 
             return response()->json([], 201);
-        } catch (PaymentGatewayException $e){
+
+        } catch (PaymentGatewayException $e) {
+//            $order->cancel();
+            return response()->json([], 422);
+        } catch (NotEnoughTicketsRemainingException $e) {
             return response()->json([], 422);
         }
-
     }
 }

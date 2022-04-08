@@ -25,6 +25,16 @@ class Concert extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function hasOrderFor($customerEmail): bool
+    {
+        return $this->orders()->whereEmail($customerEmail)->count() > 0;
+    }
+
+    public function ordersFor($customerEmail)
+    {
+        return $this->orders()->whereEmail($customerEmail)->get();
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class);

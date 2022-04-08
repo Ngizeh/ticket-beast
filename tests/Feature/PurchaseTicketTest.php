@@ -53,12 +53,8 @@ class PurchaseTicketTest extends TestCase
         ])->assertStatus(201);
 
         $this->assertEquals(7500, $this->paymentGateway->totalCharges());
-
-        $orders = $concert->orders()->whereEmail('john@example.com')->first();
-
-        $this->assertCount(3, $orders->tickets);
-
-        $this->assertNotNull($orders);
+        $this->assertTrue($concert->hasOrderFor('john@example.com'));
+        $this->assertCount(3, $concert->ordersFor('john@example.com')->first()->tickets);
     }
 
     /** @test **/
@@ -73,10 +69,7 @@ class PurchaseTicketTest extends TestCase
         ])->assertStatus(404);
 
         $this->assertEquals(0, $this->paymentGateway->totalCharges());
-
-        $orders = $concert->orders()->whereEmail('john@example.com')->first();
-
-        $this->assertNull($orders);
+        $this->assertFalse($concert->hasOrderFor('john@example.com'));
     }
 
     /** @test **/
@@ -91,8 +84,7 @@ class PurchaseTicketTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $orders = $concert->tickets()->whereEmail('john@example.com')->first();
-        $this->assertNull($orders);
+        $this->assertFalse($concert->hasOrderFor('john@example.com'));
         $this->assertEquals(0, $this->paymentGateway->totalCharges());
         $this->assertEquals(50, $concert->ticketsRemaining());
 
@@ -110,9 +102,8 @@ class PurchaseTicketTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $order = $this->concert->orders()->whereEmail('john@example.com')->first();
         $this->assertEquals(0, $this->paymentGateway->totalCharges());
-        $this->assertNull($order);
+        $this->assertFalse($concert->hasOrderFor('john@example.com'));
         $this->assertEquals(50, $concert->ticketsRemaining());
     }
 

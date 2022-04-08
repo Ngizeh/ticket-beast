@@ -105,6 +105,7 @@ class ConcertTest extends TestCase
         $this->expectException(NotEnoughTicketsRemainingException::class);
 
         $concert = Concert::factory()->create();
+
         $concert->addTickets(5);
 
         $concert->orderTickets('janedoe@example.com', 6);
@@ -121,10 +122,8 @@ class ConcertTest extends TestCase
              $concert->orderTickets('janedoe@example.com', 6);
              $concert->orderTickets('johndoe@example.com', 6);
         }catch (NotEnoughTicketsRemainingException $e){
-            $janeOrder = $concert->orders()->whereEmail('janedoe@example.com')->first();
-            $johnOrder = $concert->orders()->whereEmail('johdoe@example.com')->first();
-            $this->assertNotNull($janeOrder);
-            $this->assertNull($johnOrder);
+            $this->assertTrue($concert->hasOrderFor('janedoe@example.com'));
+            $this->assertFalse($concert->hasOrderFor('johdoe@example.com'));
             $this->assertEquals(4, $concert->ticketsRemaining());
             return;
         }

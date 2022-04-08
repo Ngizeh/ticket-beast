@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use phpDocumentor\Reflection\Types\This;
 
 class Order extends Model
 {
@@ -36,7 +37,7 @@ class Order extends Model
         return [
             'email' => $this->email,
             'ticket_quantity' => $this->tickets()->count(),
-            'amount' => $this->concert->ticket_price * $this->tickets()->count()
+            'amount' => $this->amount,
         ];
     }
 }

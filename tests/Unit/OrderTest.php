@@ -27,7 +27,7 @@ class OrderTest extends TestCase
         $this->assertEquals(5, $concert->ticketsRemaining());
 
 
-        $order = Order::forTickets($concert->findTickets(3), 'janedoe@example.com');
+        $order = Order::forTickets($concert->findTickets(3), 'janedoe@example.com', 3600);
 
         $this->assertEquals(2, $concert->ticketsRemaining());
         $this->assertEquals(3, $order->ticketsQuantity());

@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Concert;
+use Illuminate\Database\Eloquent\Collection;
 use Tests\TestCase;
 
 class TicketsTest extends TestCase
@@ -15,6 +16,17 @@ class TicketsTest extends TestCase
        $tickersAvailable = $concert->tickets()->available();
 
        $this->assertEquals($concert->ticketsRemaining(), $tickersAvailable->count());
+   }
+
+   /** @test **/
+   public function it_belongs_to_a_concert()
+   {
+       $concert = Concert::factory()->create()->addTickets(10);
+
+       $tickets = $concert->tickets;
+
+       $this->assertInstanceOf(Collection::class, $tickets);
+
    }
 
    /** @test **/

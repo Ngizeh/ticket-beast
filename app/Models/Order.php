@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use phpDocumentor\Reflection\Types\This;
 
@@ -18,7 +19,7 @@ class Order extends Model
         return $this->hasMany(Ticket::class);
     }
 
-    public function concert()
+    public function concert(): BelongsTo
     {
         return $this->belongsTo(Concert::class);
     }
@@ -32,7 +33,7 @@ class Order extends Model
         $this->delete();
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'email' => $this->email,

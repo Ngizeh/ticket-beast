@@ -19,6 +19,7 @@ class OrderTest extends TestCase
 
         $this->assertInstanceOf(Concert::class, $concert);
     }
+
     /** @test **/
     public function can_convert_the_order_to_an_array()
     {
@@ -33,6 +34,7 @@ class OrderTest extends TestCase
             'amount' => 6000
         ], $results);
     }
+
     /** @test **/
     public function can_have_many_tickets()
     {

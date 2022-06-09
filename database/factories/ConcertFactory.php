@@ -41,7 +41,7 @@ class ConcertFactory extends Factory
     }
 
     /**
-     * A concert can not be viewed if published_at field is is null
+     * A concert can not be viewed if published_at field is null
      *
      * @return Factory
      */

@@ -33,6 +33,7 @@ class PurchaseTicketTest extends TestCase
         $response = $this->orderTickets($this->concert, $this->validateData([$data => $valid]));
 
         $response->assertStatus(422);
+
         $response->assertJsonValidationErrorFor($data);
     }
 
@@ -41,7 +42,7 @@ class PurchaseTicketTest extends TestCase
         return $this->postJson("/concert/$concert->id/orders", $data);
     }
 
-    /** @test **/
+    /** @test * */
     public function customer_can_purchase_a_ticket()
     {
         $concert = Concert::factory()->published()->create(['ticket_price' => 2500])->addTickets(3);
@@ -51,6 +52,7 @@ class PurchaseTicketTest extends TestCase
             'ticket_quantity' => 3,
             'payment_token' => $this->paymentGateway->getValidToken()
         ]);
+
         $response->assertStatus(201);
 
         $response->assertExactJson([
@@ -64,7 +66,7 @@ class PurchaseTicketTest extends TestCase
         $this->assertCount(3, $concert->ordersFor('john@example.com')->first()->tickets);
     }
 
-    /** @test **/
+    /** @test * */
     public function customer_can_not_purchase_a_ticket_that_are_not_published()
     {
         $concert = Concert::factory()->unpublished()->create(['ticket_price' => 2500])->addTickets(3);
@@ -79,7 +81,7 @@ class PurchaseTicketTest extends TestCase
         $this->assertFalse($concert->hasOrderFor('john@example.com'));
     }
 
-    /** @test **/
+    /** @test * */
     public function customer_can_not_order_more_tickets_than_remaining()
     {
         $concert = Concert::factory()->published()->create(['ticket_price' => 2500])->addTickets(50);
@@ -114,31 +116,32 @@ class PurchaseTicketTest extends TestCase
         $this->assertEquals(50, $concert->ticketsRemaining());
     }
 
-    /** @test **/
+    /** @test * */
     public function email_required_to_purchase_a_ticket()
     {
         $this->postInValidated('email');
     }
 
-    /** @test **/
+    /** @test * */
     public function ticket_quantity_required_to_purchase_a_ticket()
     {
         $this->postInValidated('ticket_quantity');
     }
 
-    /** @test **/
+
+    /** @test * */
     public function ticket_quantity_required_to_and_must_be_more_than_one_purchase_a_ticket()
     {
         $this->postInValidated('ticket_quantity', 0);
     }
 
-    /** @test **/
+    /** @test * */
     public function ticket_quantity_of_type_integer_required_to_purchase_a_ticket()
     {
         $this->postInValidated('ticket_quantity', 'hustler');
     }
 
-    /** @test **/
+    /** @test * */
     public function valid_token_required_to_purchase_a_ticket()
     {
         $this->postInValidated('payment_token');

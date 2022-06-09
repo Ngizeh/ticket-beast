@@ -21,6 +21,22 @@ class OrderTest extends TestCase
     }
 
     /** @test **/
+    public function it_can_finds_an_order_for_a_ticket()
+    {
+        $concert = Concert::factory()->create(['ticket_price' => 1200])->addTickets(5);
+        $this->assertEquals(5, $concert->ticketsRemaining());
+
+
+        $order = Order::forTickets($concert->findTickets(3), 'janedoe@example.com');
+
+        $this->assertEquals(2, $concert->ticketsRemaining());
+        $this->assertEquals(3, $order->ticketsQuantity());
+        $this->assertEquals("janedoe@example.com", $order->email);
+        $this->assertEquals(3600, $order->amount);
+
+    }
+
+    /** @test **/
     public function can_convert_the_order_to_an_array()
     {
         $concert = Concert::factory()->create(['ticket_price' => 1200])->addTickets(5);

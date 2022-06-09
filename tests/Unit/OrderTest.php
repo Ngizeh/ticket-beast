@@ -10,14 +10,14 @@ use Tests\TestCase;
 class OrderTest extends TestCase
 {
     /** @test **/
-    public function it_belongs_a_concert()
+    public function it_belongs_to_many_concert_through_tickets()
     {
         $concert = Concert::factory()->create(['ticket_price' => 1200])->addTickets(5);
         $order = $concert->orderTickets('janedoe@example.com', 5);
 
         $concert = $order->concert;
 
-        $this->assertInstanceOf(Concert::class, $concert);
+        $this->assertInstanceOf(Collection::class, $concert);
     }
 
     /** @test **/

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use phpDocumentor\Reflection\Types\This;
 
@@ -19,9 +20,9 @@ class Order extends Model
         return $this->hasMany(Ticket::class);
     }
 
-    public function concert(): BelongsTo
+    public function concert(): BelongsToMany
     {
-        return $this->belongsTo(Concert::class);
+        return $this->belongsToMany(Concert::class, 'tickets');
     }
 
     public function cancel()

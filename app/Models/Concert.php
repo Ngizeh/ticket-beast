@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Exceptions\NotEnoughTicketsRemainingException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Concert extends Model
@@ -20,9 +21,9 @@ class Concert extends Model
         return $query->whereNotNull('published_at');
     }
 
-    public function orders(): HasMany
+    public function orders(): BelongsToMany
     {
-        return $this->hasMany(Order::class);
+        return $this->belongsToMany(Order::class, "tickets");
     }
 
     public function hasOrderFor($customerEmail): bool
@@ -99,7 +100,7 @@ class Concert extends Model
      */
     public function createOrder($email, $tickets): Model
     {
-        $order = $this->orders()->create([
+        $order = Order::create([
             'email' => $email,
             'amount' => $this->ticket_price * $this->tickets->count()
         ]);

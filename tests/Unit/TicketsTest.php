@@ -3,11 +3,15 @@
 namespace Tests\Unit;
 
 use App\Models\Concert;
+use App\Models\Ticket;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class TicketsTest extends TestCase
 {
+    use RefreshDatabase;
+
    /** @test **/
    public function scope_availability_of_tickets_in_reference_to_order()
    {
@@ -40,5 +44,15 @@ class TicketsTest extends TestCase
        $ticket->release();
 
        $this->assertNull($ticket->fresh()->order_id);
+   }
+
+   /** @test **/
+   public function ticket_can_be_reserved()
+   {
+       $ticket = Ticket::factory()->create();
+       $this->assertNull($ticket->reserved_at);
+
+       $ticket->reserve();
+       $this->assertNotNull($ticket->fresh()->reserved_at);
    }
 }

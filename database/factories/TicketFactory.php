@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Concert;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TicketFactory extends Factory
@@ -14,7 +15,7 @@ class TicketFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'concert_id' => fn() => Concert::factory()->create()
         ];
     }
 }

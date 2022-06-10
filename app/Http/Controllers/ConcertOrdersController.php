@@ -43,7 +43,11 @@ class ConcertOrdersController extends Controller
 
             return response()->json($order, 201);
 
-        } catch (PaymentGatewayException|NotEnoughTicketsRemainingException $e) {
+        } catch (PaymentGatewayException){
+            $reservation->cancel();
+            return response()->json([], 422);
+
+        }catch(NotEnoughTicketsRemainingException) {
             return response()->json([], 422);
         }
     }

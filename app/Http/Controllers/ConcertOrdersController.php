@@ -12,7 +12,7 @@ use App\Billing\PaymentGatewayException;
 
 class ConcertOrdersController extends Controller
 {
-    protected $paymentGateway;
+    protected PaymentGateway $paymentGateway;
 
     public function __construct(PaymentGateway $paymentGateway)
     {
@@ -31,14 +31,12 @@ class ConcertOrdersController extends Controller
 
         try {
 
-            $tickets = $concert->reserveTickets(request('ticket_quantity'));
-
-            $reservation = new Reservation($tickets);
+            $reservation = $concert->reserveTickets(request('ticket_quantity'), request('email'));
 
             $this->paymentGateway->charge($reservation->totalCost(), request('payment_token'));
 
 
-            $order = Order::forTickets($tickets, request('email'), $reservation->totalCost());
+            $order = Order::forTickets($reservation->tickets(), $reservation->email(), $reservation->totalCost());
 
 
             return response()->json($order, 201);

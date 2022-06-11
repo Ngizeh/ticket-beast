@@ -17,14 +17,14 @@ class Ticket extends Model
         return $query->whereNull('order_id')->whereNull('reserved_at');
     }
 
-    public function reserve(): bool
-    {
-        return $this->update(['reserved_at' => now()]);
-    }
-
     public function concert(): BelongsTo
     {
         return $this->belongsTo(Concert::class);
+    }
+
+    public function reserve(): bool
+    {
+        return $this->update(['reserved_at' => now()]);
     }
 
     public function release()

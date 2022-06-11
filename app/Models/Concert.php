@@ -77,9 +77,11 @@ class Concert extends Model
         return  number_format($this->ticket_price/ 100, 2);
     }
 
-    public function reserveTickets($quantity)
+    public function reserveTickets($quantity, $email)
     {
-        return $this->findTickets($quantity)->each(fn($ticket) => $ticket->reserve());
+        $tickets = $this->findTickets($quantity)->each(fn($ticket) => $ticket->reserve());
+
+        return new Reservation($tickets, $email);
     }
 
 

@@ -47,8 +47,11 @@ class ReservationTest extends TestCase
        $this->assertEquals("jane@gmail.com", $reservation->email());
    }
 
-   /** @test **/
-   public function tickets_can_be_released_when_reservation_is_cancelled() :void
+   /**
+    * @group Integration
+    * @test *
+    */
+   public function tickets_can_be_released_when_reservation_is_cancelled()
    {
        $tickets = collect([
            \Mockery::spy(Ticket::class),

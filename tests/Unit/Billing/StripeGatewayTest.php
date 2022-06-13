@@ -19,7 +19,6 @@ class StripeGatewayTest extends TestCase
     {
         parent::setUp();
 
-        $this->apiKey = config('services.stripe.secret');
-        $this->paymentGateway = new StripeGateway($this->apiKey);
+        $this->paymentGateway = new StripeGateway(config('services.stripe.secret'));
     }
 }

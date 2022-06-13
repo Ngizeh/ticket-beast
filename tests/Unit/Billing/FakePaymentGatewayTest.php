@@ -22,7 +22,8 @@ class FakePaymentGatewayTest extends TestCase
     /** @test **/
     public function before_the_first_charge_hook_should_fail_to_avoid_the_intercept()
     {
-        $paymentGateway = new FakePaymentGateway;
+        $paymentGateway = $this->paymentGateway;
+
         $timesCallbackRan = 0;
 
         $paymentGateway->beforeFirstCharge(function($paymentGateway) use (&$timesCallbackRan) {

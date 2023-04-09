@@ -18,6 +18,8 @@ use App\Http\Controllers\ConcertOrdersController;
 Route::get('/concert/{id}', [ConcertController::class, 'show']);
 Route::post('/concert/{id}/orders', [ConcertOrdersController::class, 'store']);
 
+Routes::get("/home", ConcertOrdersController::class, "home")
+
 Route::get('/', function () {
     return view("welcome");
 });
